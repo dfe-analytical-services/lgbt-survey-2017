@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1542988282005.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "FA07FA87",
+    "lastKnownWriteTime" : 1542988289,
+    "last_content_update" : 1542988289228,
+    "path" : "~/shiny/GEO/LGBTSurvey2017/lgbt-survey-2017/server.R",
+    "project_path" : "server.R",
+    "properties" : {
+        "cursorPosition" : "17,1",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

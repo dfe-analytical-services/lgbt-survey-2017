@@ -1,0 +1,9 @@
+{
+    "path" : "~/shiny/GEO/LGBTSurvey2017/lgbt-survey-2017",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}
