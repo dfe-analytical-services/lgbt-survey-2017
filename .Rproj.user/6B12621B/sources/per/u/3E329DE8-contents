@@ -1,0 +1,1 @@
+runApp("C:/Users/tdougall/OneDrive - Department for Education/Documents/shiny/GEO/LGBTSurvey2017/lgbt-survey-2017", display.mode = "showcase")

@@ -33,14 +33,21 @@ options(bitmapType='cairo')
 library(readr)
 library(dplyr)
 library(ggplot2)
+library(stringr)
 
-data <- read_csv("data/Data.csv", col_types = cols(.default = "c", value = "c"))
+#data <- read_csv("data/Data.csv", col_types = cols(.default = "c", value = "c"))
+
+data <- readRDS("data/testdata")
+
+
 
 data %>%
   mutate_at(vars(), function(x){gsub('[^ -~]', '', x)})
 
 ### Start of Shiny server
 shinyServer(function(input, output, session) {
+  
+ # outputOptions(output,"chooseFilter1",priority = 10)
   
   VersionNo <- "1.0"
   
@@ -50,58 +57,114 @@ shinyServer(function(input, output, session) {
   
   
   output$chooseDemographic <- renderUI({
-    radioButtons("chooseDemographic",label=NULL, choices = unique(data$Column))
+    selectInput("chooseDemographic",label=NULL, choices = unique(data$Column))
   })
   
+  
+  
+  # CHOOSE FILTER 1
+  
+  observe({
+  updateSelectizeInput(session,'chooseFilter1',
+                       choices = data$Filter1[data$Row == input$chooseQuestion &
+                                              data$Column == input$chooseDemographic])
+  })  
+
+  
   output$chooseFilter1 <- renderUI({
-    radioButtons("chooseFilter1", selected = "None",
-                label = h5("Filter"), choices = unique(data$Filter1))
+  selectInput("chooseFilter1",label=NULL, choices =  NULL)
+    
+  })
+  
+  # CHOOSE FILTER 1 OPTION
+  
+  observe({
+    updateSelectizeInput(session,'chooseFilter1Option',
+                         choices = data$Filter1Option[data$Row == input$chooseQuestion &
+                                                        data$Column == input$chooseDemographic &
+                                                        data$Filter1 == input$chooseFilter1])
   })
   
   
   output$chooseFilter1Option <- renderUI({
-    if(is.null(input$chooseFilter1)){return(NULL)}
-    radioButtons("chooseFilter1Option",
-                label = h5("Filter Options"), choices = unique(data[data$Filter1 == input$chooseFilter1,]$Filter1Option))
-  })  
-
-  output$chooseFilter2 <- renderUI({
-    radioButtons("chooseFilter2", selected = "None",
-                label = h5("Filter"), choices = unique(data[data$Filter1       == input$chooseFilter1     &
-                                                            data$Filter1Option == input$chooseFilter1Option,]$Filter2))
+  selectizeInput(inputId = "chooseFilter1Option",label=NULL, selected = "None", choices = NULL)
   })
 
+  # CHOOSE FILTER 2
+  
+  observe({
+    updateSelectizeInput(session,'chooseFilter2',
+                         choices = data$Filter2[data$Row == input$chooseQuestion &
+                                                  data$Column == input$chooseDemographic &
+                                                  data$Filter1 == input$chooseFilter1 &
+                                                  data$Filter1Option == input$chooseFilter1Option])
+  })
+  
+  
+  output$chooseFilter2 <- renderUI({
+      selectInput("chooseFilter2",label=NULL, selected = "None", choices = NULL)
+    })
+
+  
+  # CHOOSE FILTER 2 OPTION
 
   output$chooseFilter2Option <- renderUI({
-    if(is.null(input$chooseFilter2)){return(NULL)}
-    radioButtons("chooseFilter2Option",
-                label = h5("Filter Options"), choices = unique(data[data$Filter1       == input$chooseFilter1     &
-                                                                    data$Filter1Option == input$chooseFilter1Option &
-                                                                    data$Filter2       == input$chooseFilter2,]$Filter2Option))
+      selectizeInput(inputId = "chooseFilter2Option",label=NULL, choices = NULL)
+    })
+
+  observe({
+    updateSelectizeInput(session,'chooseFilter2Option',
+                         choices = data$Filter2Option[data$Row == input$chooseQuestion &
+                                                        data$Column == input$chooseDemographic &
+                                                        data$Filter1 == input$chooseFilter1 &
+                                                        data$Filter1Option == input$chooseFilter1Option &
+                                                        data$Filter2 == input$chooseFilter2])
   })
+ 
+
+  # output$chooseFilter1 <- renderUI({
+  #   selectInput("chooseFilter1",label=NULL, selected = "None", choices = unique(data$Filter1))
+  # })
+  # 
+  # 
+  # output$chooseFilter1Option <- renderUI({
+  #   if(is.null(input$chooseFilter1)){return(NULL)}
+  #   selectInput("chooseFilter1Option",label=NULL, choices = unique(data[data$Filter1 == input$chooseFilter1,]$Filter1Option))
+  # })
+
+  
+  
+  # output$chooseFilter2 <- renderUI({
+  #   selectInput("chooseFilter2",label=NULL, selected = "None", choices = unique(data[data$Filter1       == input$chooseFilter1     &
+  #                                                           data$Filter1Option == input$chooseFilter1Option,]$Filter2))
+  # })
+  # 
+  # 
+  # output$chooseFilter2Option <- renderUI({
+  #   if(is.null(input$chooseFilter2)){return(NULL)}
+  #   selectInput("chooseFilter2Option",label=NULL, choices = unique(data[data$Filter1       == input$chooseFilter1     &
+  #                                                                   data$Filter1Option == input$chooseFilter1Option &
+  #                                                                   data$Filter2       == input$chooseFilter2,]$Filter2Option))
+  # })
 
 
 
   output$table <-  renderTable({
-    if((length(input$chooseFilter1Option) == 0 && !is.null(input$chooseFilter1))){return(NULL)}
-    if((length(input$chooseFilter2Option) == 0 && !is.null(input$chooseFilter2))){return(NULL)}
-    if(outputlist()$datatest == FALSE){return(NULL)}
     print(outputlist()$dataout)
   },
   include.rownames=FALSE
   )
   
   output$stackedplot <- renderPlot({
-    if((length(input$chooseFilter1Option) == 0 && !is.null(input$chooseFilter1))){return(NULL)}
-    if((length(input$chooseFilter2Option) == 0 && !is.null(input$chooseFilter2))){return(NULL)}
-    if(outputlist()$datatest == FALSE){return(NULL)}
+    if(is.null(outputlist())){return(NULL)}
     print(outputlist()$stackedplot)
   })
   
   
   output$Title<- renderText({
+    if(is.null(input$chooseFilter2Option)){return(NULL)}
     if(outputlist()$datatest == FALSE){return(NULL)}
-    paste0("<h4> This question covers ",input$chooseQuestion," by this ",input$chooseDemographic, " demographic",
+    paste0("<h5> This question covers ",input$chooseQuestion," by this ",input$chooseDemographic, " demographic",
            "<p> 
             <br>
             You have chosen to filter the respondents by ",input$chooseFilter1Option," and by ", input$chooseFilter2Option,
@@ -118,7 +181,7 @@ shinyServer(function(input, output, session) {
   
   
   output$NoData <- renderText({
-    if(outputlist()$datatest == TRUE){return(NULL)}
+    if(outputlist()$datatest != "No Data"){return(NULL)}
     HTML("<h4> No data available </h4>
          <br>
          <p> There were no respondents to the survey for the options you have chosen.</p>
@@ -143,45 +206,39 @@ shinyServer(function(input, output, session) {
   )
   
   
-  outputlist  <- reactive({
-    
-    if(is.null(input$chooseFilter1)){
-        Filter1       <- "None"
-        Filter1Option <- "None"} else {
-        Filter1       <- input$chooseFilter1
-        Filter1Option <- input$chooseFilter1Option}  
-        
-    if(is.null(input$chooseFilter2)){
-        Filter2       <- "None"
-        Filter2Option <- "None"} else {
-        Filter2       <- input$chooseFilter2
-        Filter2Option <- input$chooseFilter2Option} 
-    
-    w.data <- data[data$Row           == input$chooseQuestion        & 
-                   data$Column        == input$chooseDemographic     &
-                   data$Filter1       == Filter1       &
-                   data$Filter1Option == Filter1Option  &
-                   data$Filter2       == Filter2        & 
-                   data$Filter2Option == Filter2Option,]    
-    
 
+
+  outputlist  <- reactive({
+  
+    w.data <- data[data$Row           == input$chooseQuestion       & 
+                   data$Column        == input$chooseDemographic    &
+                   data$Filter1       == input$chooseFilter1        &
+                   data$Filter1Option == input$chooseFilter1Option  &
+                   data$Filter2       == input$chooseFilter2        & 
+                   data$Filter2Option == input$chooseFilter2Option,]    
+    
+    
+    print(w.data$value[1])
+    
+    if(w.data$value[1] == "NA" || is.na(w.data$value[1])){
+      return(list(datatest=FALSE, dataout=NULL, stackedplot=NULL,download=NULL))}
+   
+    if(w.data$value[1] == "No Data available"){
+      return(list(datatest="No Data", dataout=NULL, stackedplot=NULL,download=NULL))}
+      
+  
     
    colorder <- unique(w.data$Columns)
    roworder <- unique(w.data$Rows)
     
-   
-   if(w.data$value[1] == "No Data available"){
-   datatest <- FALSE 
-   table <- NULL
-   stackedplot <- NULL
-   }else{
-   
    datatest <- TRUE   
-     
+    
    table <- dcast(w.data, Rows ~ Columns, value.var="value")
    table <- select(.data = table, Rows, colorder)
    table <- arrange(.data = table, order(roworder))
+   download <- table
    
+   table[1:nrow(table)-1,2:ncol(table)] <- sapply(table[1:nrow(table)-1,2:ncol(table)],reduce)
 
    
    w.data$Rows <- factor(w.data$Rows, levels = rev(roworder))
@@ -190,13 +247,17 @@ shinyServer(function(input, output, session) {
 
    
    stackedplot <- ggplot(data = w.data[w.data$Rows != "Totals",], aes(x = Columns, y = as.numeric(value), fill = Rows)) + geom_bar(stat='identity') +
-    xlab(input$chooseFilter2) +
-    ylab(input$chooseFilter1)
-   }
+    xlab(input$chooseDemographic) +
+    ylab("Percentage (%)")+
+     theme(axis.text=element_text(size=12),
+           axis.title=element_text(size=14,face="bold"),
+           legend.text=element_text(size=12),
+           legend.title=element_text(size=14,face="bold"))
+   
       
 
    
-   return(list(datatest=datatest, dataout=table, stackedplot=stackedplot))
+   return(list(datatest=datatest, dataout=table, stackedplot=stackedplot,download=download))
   
    
    })
@@ -206,6 +267,7 @@ shinyServer(function(input, output, session) {
 
 })
   
+reduce <-function(x){paste0(substr(x, start = 0, stop= which(strsplit(x, "")[[1]]==".")+1)," %")}
 
 args(png)
 getOption('bitmapType')
