@@ -39,7 +39,7 @@ require(dplyr)
 
 
 
-shinyUI(fluidPage(theme="bootstrap.css",
+shinyUI(fluidPage(theme="shiny.css",
 
 
                   
