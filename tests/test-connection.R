@@ -30,7 +30,6 @@ test_that("Can connect to app", {
   remDr$navigate(appURL)
   Sys.sleep(2)
   appTitle <- remDr$getTitle()[[1]]
-  expect_equal(theme, "shiny.css")
 })
 
 remDr$close()
