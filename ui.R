@@ -36,102 +36,91 @@ require(plyr)
 require(data.table)
 require(dplyr)
 
-
-
-
 shinyUI(fluidPage(theme="shiny.css",
-
-
-                  
+ 
 
   # tags$style(type="text/css",
   #            ".shiny-output-error { visibility: hidden; }",
   #            ".shiny-output-error:before { visibility: hidden; }"
   # ),
   
-  navbarPage("LGBTSurvey2017 v1.0",theme = "shiny.css", inverse = FALSE,
-          #   tabPanel("Intro",
-           #           wellPanel("I'm gonna write loads of cool info to help users")),
+  navbarPage("NationalLGBTSurvey2017 alpha build",theme = "shiny.css", inverse = FALSE,
+             tabPanel("Home",
+                      wellPanel("Welcome to the LGBT Survey 2017 App. Contained here is over half a million tables to choose from.")),
+             tabPanel("Terminology",
+                      wellPanel("x - suppresed", 
+                                br(),"'-' - 0 respondents")),
              tabPanel("Analyse",
-  titlePanel("LGBT Survey 2017"),
+  titlePanel("National LGBT Survey 2017"),
   
   fluidRow(
+    column(12,
+           conditionalPanel(  
+             condition = "input.chooseFilter3Option == null",
+             wellPanel(h5(strong("Please wait while data is loaded into the app, initial loading can take a few min."))
+             ))
+    ),
     column(3,
-           bsCollapse(id = "Panels", open = list("Question","Demographic","Filter 1","Filter 2"), multiple = TRUE,
-                      # bsCollapsePanel(title = "Question",
-                      #                 uiOutput("chooseQuestion"),
-                      #                 style = "primary"),
-                      bsCollapsePanel(title = "Demographic",
-                                      uiOutput("chooseDemographic"),
-                                      style = "info")),
-                      bsCollapsePanel(title = "Filter 1",
-                                      uiOutput("chooseFilter1"),
-                                      uiOutput("chooseFilter1Option"),
-                                      style = "success"),
-                      bsCollapsePanel(title = "Filter 2",
-                                      uiOutput("chooseFilter2"),
-                                      uiOutput("chooseFilter2Option"),
-                                      style = "success"),
-           downloadButton('downloadData', 'Download .csv of Results')),
+           wellPanel(
+             h5(strong("Choose chapter"),br(),"In this panel you will choose which part of the survey you would like to view.",br(),"First, pick a chapter of the survey,
+                most chapters are then split into sections followed by multiple questions."),
+             br(),
+             h5(strong("Chapter")),
+             uiOutput("chooseChapter"),
+             h5(strong("Section")),
+             uiOutput("chooseSection"),
+             h5(strong("Choose Question")),
+             uiOutput("chooseQuestion")),
+           wellPanel(
+             h5(strong("All / Trans / Cisgender respondents")),
+             uiOutput("chooseFilter1Option"),
+             h5(strong("Demographic"),br(),"Choose respondents demographic"),
+             uiOutput("chooseDemographic")),
+           wellPanel(
+             h5(strong("Subset the data"),br(),"You can now filter the respondents for who will appear in the table."),
+             br(),
+             h5(strong("Filter Respondents 1")),
+             uiOutput("chooseFilter2"),
+             uiOutput("chooseFilter2Option"),
+             h5(strong("Filter Respondents 2")),
+             uiOutput("chooseFilter3"),
+             uiOutput("chooseFilter3Option"))),
+
       column(8,
-             wellPanel(
-             uiOutput("NoData"),
-             uiOutput("Title")),
+             fluidRow(
+               column(6,
+                 conditionalPanel(  
+                   condition = "input.chooseFilter3Option != null",
+                   wellPanel(h5(strong("Generate Table"),br(),"Once you have chosen your table options, click to generate"),
+                   actionButton("do", "Analyse"))
+                 )
+               ),
+               column(6,
+                      conditionalPanel(  
+                        condition = "input.chooseFilter3Option != null",
+                        wellPanel(h5(strong("Download Table"),br(),"Here you can download the table you have created. It will download as a .csv file"),
+                   downloadButton('downloadData', 'Download .csv of Results'))
+                 )
+               )
+             ),
+             fluidRow(     
+               conditionalPanel(  
+                 condition = "input.do > 0",
+                 wellPanel(uiOutput("NoData"),
+                 uiOutput("Title")
+                 )),
              plotOutput("stackedplot"),
              br(),
-             wellPanel(
-             uiOutput("table")),
-             conditionalPanel(condition="!is.null(table)",
-                              wellPanel(uiOutput("Notes")))
+             conditionalPanel(  
+               condition = "input.do > 0",
+               wellPanel( uiOutput("table")
+               )),
+             conditionalPanel(
+               condition = "input.do > 0",
+               wellPanel(uiOutput("Notes"))))
 
 ))), tabPanel("Help",
-               wellPanel("I'm gonna write loads of cool info to help users"))
-, tabPanel("Test",
-           sidebarLayout(
-             sidebarPanel(
-               h4(strong("Local Authority (LA) level exclusions")),
-               br(),
-               uiOutput("chooseQuestion"),
-               h5(strong("Instructions")),
-               "From the dropdown menus below, please select the area and exclusion type of interest. Then use the chart and table to see how exclusion figures have changed over time for the coverage selected.",
-               br(),
-               "The rate or number radio buttons can be used to change between exclusion rates and number of exclusions respectively. A comparison to regional and national figures figures can also be seen by clicking the appropriate tab.", 
-               hr(),
-               h5(strong("1. Pick an area")),
-               
-               h5(strong("2. Pick an exclusion category")),
-               
-               hr(),
-               
-               br(),
-               
-               br(),
-               
-               br()
-             ),
-             mainPanel(tabsetPanel(
-               tabPanel(
-                 'Trend',
-                 
-                 br(),
-                 
-                 br(),
-                 
-                 br()),
-               tabPanel(
-                 'Comparison to region and national',
-                 br(),
-                 strong("State-funded primary, secondary and special schools"),
-                 br(),
-                 br(),
-                 
-                 br(),
-                 
-                 br(),
-                 
-                 br())))
-           ),
-           hr())  
+               wellPanel("Please contact Tom for help"))
 )
 ))
 
