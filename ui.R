@@ -49,7 +49,7 @@ shinyUI(fluidPage(theme="shiny.css",
   #            ".shiny-output-error:before { visibility: hidden; }"
   # ),
   
-  navbarPage("LGBTSurvey2017 v1.0",theme = "bootstrap.css", inverse = FALSE,
+  navbarPage("LGBTSurvey2017 v1.0",theme = "shiny.css", inverse = FALSE,
           #   tabPanel("Intro",
            #           wellPanel("I'm gonna write loads of cool info to help users")),
              tabPanel("Analyse",
