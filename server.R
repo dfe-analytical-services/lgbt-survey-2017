@@ -37,12 +37,15 @@ library(dplyr)
 library(ggplot2)
 library(stringr)
 
-#data <- readRDS("C:/Users/tdougall/OneDrive - Department for Education/Documents/shiny/GEO/LGBTSurvey2017/lgbt-survey-2017 test/data/datatest")
+
+start.time <- Sys.time()
+
+print(start.time)
 
 data <- readRDS("data/Data")
-#data <- data %>% mutate_at(vars(), function(x){gsub('[^ -~]', '', x)})
-data$value <- as.character(data$value)
+data <- data %>% mutate_at(vars(), function(x){gsub('[^ -~]', '', x)})
 
+print(Sys.time() - start.time)
 
 vlookup <- read.csv("data/vlookup.csv",na.strings = "",header = TRUE)
 
