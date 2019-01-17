@@ -36,23 +36,28 @@ library(readr)
 library(dplyr)
 library(ggplot2)
 library(stringr)
+library(data.table)
 
-#data <- readRDS("C:/Users/tdougall/OneDrive - Department for Education/Documents/shiny/GEO/LGBTSurvey2017/lgbt-survey-2017 test/data/datatest")
+start.time <- Sys.time()
 
-data <- readRDS("data/Data")
-#data <- data %>% mutate_at(vars(), function(x){gsub('[^ -~]', '', x)})
-data$value <- as.character(data$value)
+# setwd("C:/Users/tdougall/OneDrive - Department for Education/Documents/shiny/GEO/LGBTSurvey2017/lgbt-survey-2017/")
 
+data <- readRDS("data/DummyData")
+
+data <- data %>% mutate_at(vars(), function(x){gsub('[^ -~]', '', x)})
 
 vlookup <- read.csv("data/vlookup.csv",na.strings = "",header = TRUE)
 
-tables <- unique(data[,c("Chapter","Section","Question","Demographic","Filter1","Filter1Options","Filter2","Filter2Options","Filter3","Filter3Options")])
+tables <- distinct(data[,c("Chapter","Section","Question","Demographic","Filter1","Filter1Options","Filter2","Filter2Options","Filter3","Filter3Options")])
+
+print(Sys.time() - start.time)
 
 reduce <- function(x){
-  print(x)
-  #print(paste0(substr(x, start = 0, stop= which(strsplit(x, "")[[1]]==".")+1)," %"))
-  paste0(substr(x, start = 0, stop= which(strsplit(x, "")[[1]]==".")+1)," %")
+  if(grepl(".",x,fixed=TRUE)){
+  paste0(substr(x, start = 0, stop= which(strsplit(x, "")[[1]]==".")+1)," %")} else {
+  paste0(x," %")
   }
+    }
 
 # reduce <- function(x){
 #   print(x)
@@ -307,30 +312,25 @@ shinyServer(function(input, output, session) {
                    data$Filter2Options == input$chooseFilter2Option  &
                    data$Filter3        == input$chooseFilter3        &
                    data$Filter3Options == input$chooseFilter3Option,]
-    
-        
-        
-        
+  
+
     if(w.data$value[1] == "NA" || is.na(w.data$value[1])){
         return(list(datatest=FALSE, dataout=NULL, stackedplot=NULL,download=NULL))}
    
     if(w.data$value[1] == "No Data available"){
       return(list(datatest="No Data", dataout=NULL, stackedplot=NULL,download=NULL))}
-      
-  
-    
+     
+
    colorder <- unique(w.data$Columns)
    roworder <- unique(w.data$Rows)
-    
+   
    datatest <- TRUE   
-    
+   
    table <- dcast(w.data, Rows ~ Columns, value.var="value")
-   table <- select(.data = table, Rows, colorder)
    table <- arrange(.data = table, order(roworder))
    download <- table
-   
+      
    table[(1:nrow(table)-1),2:ncol(table)] <- sapply(table[1:nrow(table)-1,2:ncol(table)],reduce)
-   
    #table[(1:nrow(table)-1),2:ncol(table)] %>% mutate_all(funs(reduce))
    
    w.data$Rows <- factor(w.data$Rows, levels = rev(roworder))
