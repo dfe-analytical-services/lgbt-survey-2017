@@ -40,7 +40,7 @@ library(data.table)
 
 start.time <- Sys.time()
 
-setwd("C:/Users/tdougall/OneDrive - Department for Education/Documents/shiny/GEO/LGBTSurvey2017/lgbt-survey-2017/")
+# setwd("C:/Users/tdougall/OneDrive - Department for Education/Documents/shiny/GEO/LGBTSurvey2017/lgbt-survey-2017/")
 
 data <- readRDS("data/DummyData")
 
