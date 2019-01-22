@@ -52,26 +52,14 @@ tables <- distinct(data[,c("Chapter","Section","Question","Demographic","Filter1
 
 print(Sys.time() - start.time)
 
-reduce <- function(x){
-  if(grepl(".",x,fixed=TRUE)){
-  paste0(substr(x, start = 0, stop= which(strsplit(x, "")[[1]]==".")+1)," %")} else {
-  paste0(x," %")
-  }
-    }
-
-# reduce <- function(x){
-#   print(x)
-#   #print(paste0(substr(x, start = 0, stop= which(strsplit(x, "")[[1]]==".")+1)," %"))
-#   if(grepl(".",x)){
-#     paste0(substr(x, start = 0, stop= which(strsplit(x, "")[[1]]==".")+1)," %")
-#   }else if(grepl("x",x) || grepl("-",x)){
-#     return(x)
-#   } else{paste0(x," %",sep="")
-#   }
-# }
-  
-  
-
+reduce <- function(b){
+  sapply(b, FUN = function(a) {
+    if(grepl("\\.",a) == TRUE){
+      paste0(substr(a, start = 0, stop= which(strsplit(a, "")[[1]]==".")+1)," %")
+    }else if(grepl("x",a)  == TRUE | grepl("-",a)  == TRUE){
+      return(a)
+    } else{paste0(a," %",sep="")}})
+}
 
 
 ### Start of Shiny server
@@ -336,13 +324,22 @@ shinyServer(function(input, output, session) {
    w.data$Rows <- factor(w.data$Rows, levels = rev(roworder))
    w.data$Columns <- factor(w.data$Columns , levels = colorder)  
    
-   stackedplot <- ggplot(data = w.data[w.data$Rows != "Totals",], aes(x = Columns, y = as.numeric(value), fill = Rows)) + geom_bar(stat='identity') +
-    xlab(input$chooseDemographic) +
-    ylab("Percentage (%)")+
-     theme(axis.text=element_text(size=12),
+   w.data$value[w.data$value == "x"] <- "0"
+   w.data$value[w.data$value == "-"] <- "0"
+   
+   pallete_no <- nrow(table)-1
+   pallete <- get(paste0("lgbt_pallete_",pallete_no))
+   
+   stackedplot <- ggplot(data = w.data[w.data$Rows != "Totals",], aes(x = Columns, y = as.numeric(value), fill = Rows)) +
+     geom_bar(stat='identity') +
+     xlab(input$chooseDemographic) +
+     ylab("Percentage (%)")+
+     scale_fill_manual(values = pallete )+
+     guides(fill = guide_legend(reverse = TRUE)) +
+     theme(axis.text=element_text(size=12, angle = 45, h=1),
            axis.title=element_text(size=14,face="bold"),
            legend.text=element_text(size=12),
-           legend.title=element_text(size=14,face="bold"))
+           legend.title=element_text(size=14,face="bold")) 
    
    
    return(list(datatest=datatest, dataout=table, stackedplot=stackedplot,download=download))
@@ -354,3 +351,200 @@ shinyServer(function(input, output, session) {
   session$onSessionEnded(function() { stopApp() })
 
 })
+
+
+lgbt_pallete <- rev(c(
+  rgb(231, 211, 218, maxColorValue = 255),
+  rgb(219, 189, 200, maxColorValue = 255),
+  rgb(207, 167, 181, maxColorValue = 255),
+  rgb(184, 123, 143, maxColorValue = 255),
+  rgb(160, 79, 106, maxColorValue = 255),
+  rgb(136, 35, 69, maxColorValue = 255),
+  rgb(204, 212, 224, maxColorValue = 255),
+  rgb(188, 190, 208, maxColorValue = 255),
+  rgb(153, 168, 193, maxColorValue = 255),
+  rgb(102, 125, 162, maxColorValue = 255),
+  rgb(77, 103, 147, maxColorValue = 255),
+  rgb(51, 81, 132, maxColorValue = 255),
+  rgb(0, 38, 100, maxColorValue = 255)))
+
+
+lgbt_pallete_1 <- c(rgb(204, 212, 224, maxColorValue = 255))
+
+
+lgbt_pallete_2 <- c(rgb(204,212,224, maxColorValue = 255),
+                    rgb(0, 38, 100, maxColorValue = 255))
+
+lgbt_pallete_3 <- c(rgb(204,212,224, maxColorValue = 255),
+                    rgb(102, 125, 162, maxColorValue = 255),
+                    rgb(0, 38, 100, maxColorValue = 255))
+
+lgbt_pallete_4 <- c(rgb(204, 212, 224, maxColorValue = 255),
+                    rgb(153, 168, 193, maxColorValue = 255),
+                    rgb(102, 125, 162, maxColorValue = 255),
+                    rgb(0, 38, 100, maxColorValue = 255))
+
+lgbt_pallete_5 <- c(rgb(204, 212, 224, maxColorValue = 255),
+                    rgb(153, 168, 193, maxColorValue = 255),
+                    rgb(102, 125, 162, maxColorValue = 255),
+                    rgb(51, 81, 131, maxColorValue = 255),
+                    rgb(0, 38, 100, maxColorValue = 255))
+
+lgbt_pallete_6 <- c(rgb(136, 35, 69, maxColorValue = 255),
+                    rgb(204, 212, 224, maxColorValue = 255),
+                    rgb(153, 168, 193, maxColorValue = 255),
+                    rgb(102, 125, 162, maxColorValue = 255),
+                    rgb(51, 81, 131, maxColorValue = 255),
+                    rgb(0, 38, 100, maxColorValue = 255))
+
+lgbt_pallete_7 <- c(
+  rgb(231, 211, 218, maxColorValue = 255),
+  rgb(184, 123, 143, maxColorValue = 255),
+  rgb(136, 35, 69, maxColorValue = 255),
+  rgb(204, 212, 224, maxColorValue = 255),
+  rgb(153, 168, 193, maxColorValue = 255),
+  rgb(102, 125, 162, maxColorValue = 255),
+  rgb(0, 38, 100, maxColorValue = 255))
+
+lgbt_pallete_8 <- c(
+  rgb(231, 211, 218, maxColorValue = 255),
+  rgb(207, 167, 181, maxColorValue = 255),
+  rgb(184, 123, 143, maxColorValue = 255),
+  rgb(136, 35, 69, maxColorValue = 255),
+  rgb(204, 212, 224, maxColorValue = 255),
+  rgb(153, 168, 193, maxColorValue = 255),
+  rgb(102, 125, 162, maxColorValue = 255),
+  rgb(0, 38, 100, maxColorValue = 255))
+
+lgbt_pallete_9 <- c(
+  rgb(231, 211, 218, maxColorValue = 255),
+  rgb(207, 167, 181, maxColorValue = 255),
+  rgb(184, 123, 143, maxColorValue = 255),
+  rgb(136, 35, 69, maxColorValue = 255),
+  rgb(204, 212, 224, maxColorValue = 255),
+  rgb(153, 168, 193, maxColorValue = 255),
+  rgb(102, 125, 162, maxColorValue = 255),
+  rgb(51, 81, 132, maxColorValue = 255),
+  rgb(0, 38, 100, maxColorValue = 255))
+
+lgbt_pallete_10 <- c(
+  rgb(231, 211, 218, maxColorValue = 255),
+  rgb(207, 167, 181, maxColorValue = 255),
+  rgb(184, 123, 143, maxColorValue = 255),
+  rgb(160, 79, 106, maxColorValue = 255),
+  rgb(136, 35, 69, maxColorValue = 255),
+  rgb(204, 212, 224, maxColorValue = 255),
+  rgb(153, 168, 193, maxColorValue = 255),
+  rgb(102, 125, 162, maxColorValue = 255),
+  rgb(51, 81, 132, maxColorValue = 255),
+  rgb(0, 38, 100, maxColorValue = 255))
+
+lgbt_pallete_11 <- c(
+  rgb(231, 211, 218, maxColorValue = 255),
+  rgb(207, 167, 181, maxColorValue = 255),
+  rgb(184, 123, 143, maxColorValue = 255),
+  rgb(160, 79, 106, maxColorValue = 255),
+  rgb(136, 35, 69, maxColorValue = 255),
+  rgb(204, 212, 224, maxColorValue = 255),
+  rgb(153, 168, 193, maxColorValue = 255),
+  rgb(102, 125, 162, maxColorValue = 255))
+
+lgbt_pallete_12 <- c(
+  rgb(231, 211, 218, maxColorValue = 255),
+  rgb(207, 167, 181, maxColorValue = 255),
+  rgb(184, 123, 143, maxColorValue = 255),
+  rgb(160, 79, 106, maxColorValue = 255),
+  rgb(136, 35, 69, maxColorValue = 255),
+  rgb(204, 212, 224, maxColorValue = 255),
+  rgb(153, 168, 193, maxColorValue = 255),
+  rgb(102, 125, 162, maxColorValue = 255),
+  rgb(51, 81, 132, maxColorValue = 255))
+
+lgbt_pallete_13 <- c(
+  rgb(231, 211, 218, maxColorValue = 255),
+  rgb(219, 189, 200, maxColorValue = 255),
+  rgb(207, 167, 181, maxColorValue = 255),
+  rgb(184, 123, 143, maxColorValue = 255),
+  rgb(160, 79, 106, maxColorValue = 255),
+  rgb(136, 35, 69, maxColorValue = 255),
+  rgb(204, 212, 224, maxColorValue = 255),
+  rgb(188, 190, 208, maxColorValue = 255),
+  rgb(153, 168, 193, maxColorValue = 255),
+  rgb(102, 125, 162, maxColorValue = 255),
+  rgb(77, 103, 147, maxColorValue = 255),
+  rgb(51, 81, 132, maxColorValue = 255),
+  rgb(0, 38, 100, maxColorValue = 255))
+
+lgbt_pallete_14 <- c(
+  rgb(237,151, 75, maxColorValue = 255),
+  rgb(232,125,30, maxColorValue = 255),
+  rgb(231, 211, 218, maxColorValue = 255),
+  rgb(219, 189, 200, maxColorValue = 255),
+  rgb(207, 167, 181, maxColorValue = 255),
+  rgb(184, 123, 143, maxColorValue = 255),
+  rgb(160, 79, 106, maxColorValue = 255),
+  rgb(136, 35, 69, maxColorValue = 255),
+  rgb(204, 212, 224, maxColorValue = 255),
+  rgb(188, 190, 208, maxColorValue = 255),
+  rgb(153, 168, 193, maxColorValue = 255),
+  rgb(102, 125, 162, maxColorValue = 255),
+  rgb(77, 103, 147, maxColorValue = 255),
+  rgb(51, 81, 132, maxColorValue = 255),
+  rgb(0, 38, 100, maxColorValue = 255))
+
+lgbt_pallete_15 <- c(
+  rgb(241,177,120, maxColorValue = 255),
+  rgb(237,151, 75, maxColorValue = 255),
+  rgb(232,125,30, maxColorValue = 255),
+  rgb(231, 211, 218, maxColorValue = 255),
+  rgb(219, 189, 200, maxColorValue = 255),
+  rgb(207, 167, 181, maxColorValue = 255),
+  rgb(184, 123, 143, maxColorValue = 255),
+  rgb(160, 79, 106, maxColorValue = 255),
+  rgb(136, 35, 69, maxColorValue = 255),
+  rgb(204, 212, 224, maxColorValue = 255),
+  rgb(188, 190, 208, maxColorValue = 255),
+  rgb(153, 168, 193, maxColorValue = 255),
+  rgb(102, 125, 162, maxColorValue = 255),
+  rgb(77, 103, 147, maxColorValue = 255),
+  rgb(51, 81, 132, maxColorValue = 255),
+  rgb(0, 38, 100, maxColorValue = 255))
+
+lgbt_pallete_16 <- c(
+  rgb(246,203,165, maxColorValue = 255),
+  rgb(241,177,120, maxColorValue = 255),
+  rgb(237,151, 75, maxColorValue = 255),
+  rgb(232,125,30, maxColorValue = 255),
+  rgb(231, 211, 218, maxColorValue = 255),
+  rgb(219, 189, 200, maxColorValue = 255),
+  rgb(207, 167, 181, maxColorValue = 255),
+  rgb(184, 123, 143, maxColorValue = 255),
+  rgb(160, 79, 106, maxColorValue = 255),
+  rgb(136, 35, 69, maxColorValue = 255),
+  rgb(204, 212, 224, maxColorValue = 255),
+  rgb(188, 190, 208, maxColorValue = 255),
+  rgb(153, 168, 193, maxColorValue = 255),
+  rgb(102, 125, 162, maxColorValue = 255),
+  rgb(77, 103, 147, maxColorValue = 255),
+  rgb(51, 81, 132, maxColorValue = 255),
+  rgb(0, 38, 100, maxColorValue = 255))
+
+lgbt_pallete_17 <- c(
+  rgb(250,229,210, maxColorValue = 255),
+  rgb(246,203,165, maxColorValue = 255),
+  rgb(241,177,120, maxColorValue = 255),
+  rgb(237,151, 75, maxColorValue = 255),
+  rgb(232,125,30, maxColorValue = 255),
+  rgb(231, 211, 218, maxColorValue = 255),
+  rgb(219, 189, 200, maxColorValue = 255),
+  rgb(207, 167, 181, maxColorValue = 255),
+  rgb(184, 123, 143, maxColorValue = 255),
+  rgb(160, 79, 106, maxColorValue = 255),
+  rgb(136, 35, 69, maxColorValue = 255),
+  rgb(204, 212, 224, maxColorValue = 255),
+  rgb(188, 190, 208, maxColorValue = 255),
+  rgb(153, 168, 193, maxColorValue = 255),
+  rgb(102, 125, 162, maxColorValue = 255),
+  rgb(77, 103, 147, maxColorValue = 255),
+  rgb(51, 81, 132, maxColorValue = 255),
+  rgb(0, 38, 100, maxColorValue = 255))
