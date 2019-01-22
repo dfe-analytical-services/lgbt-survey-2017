@@ -103,21 +103,26 @@ shinyUI(fluidPage(theme="shiny.css",
                  )
                )
              ),
-             fluidRow(     
+             fluidRow(    
+               column(12,
+               
                conditionalPanel(  
                  condition = "input.do > 0",
-                 wellPanel(uiOutput("NoData"),
+                 uiOutput("NoData"),
                  uiOutput("Title")
-                 )),
+                 ),
              plotOutput("stackedplot"),
              br(),
              conditionalPanel(  
                condition = "input.do > 0",
-               wellPanel( uiOutput("table")
-               )),
+               uiOutput("table")
+               ),
              conditionalPanel(
                condition = "input.do > 0",
-               wellPanel(uiOutput("Notes"))))
+               uiOutput("Notes")),
+             br(),
+             br())
+             )
 
 ))), tabPanel("Help",
                wellPanel("Please contact Tom for help"))
