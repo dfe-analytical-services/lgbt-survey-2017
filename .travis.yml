@@ -17,6 +17,7 @@ cache:
   - "$TRAVIS_BUILD_DIR/packrat/lib"
   packages: true
 script:
+- Rscript -e 'download.file("https://drive.google.com/open?id=1uBfl0_vrHbb-cNwCcpGFtt6WKyBr70qy",destfile = "~/data/")'
 - nohup R --slave --no-restore -e 'shiny::runApp(port = 3000)' &
 - R -f test.R
 addons:
