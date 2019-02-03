@@ -17,9 +17,9 @@ cache:
   - "$TRAVIS_BUILD_DIR/packrat/lib"
   packages: true
 script:
+- Rscript -e 'download.file("https://www.dropbox.com/s/5kwwdfxfm2w7nc0/SQLDB.sqlite?dl=1",destfile = "./data/SQLDB.sqlite")'
 - nohup R --slave --no-restore -e 'shiny::runApp(port = 3000)' &
 - R -f test.R
-- Rscript -e 'download.file("https://www.dropbox.com/s/5kwwdfxfm2w7nc0/SQLDB.sqlite?dl=1",destfile = "./data/SQLDB.sqlite")'
 addons:
   sauce_connect:
     username: "$SAUCE_USERNAME"
