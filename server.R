@@ -55,7 +55,7 @@ library(DT)
 
 start.time <- Sys.time()
 
-db      <- DBI::dbConnect(RSQLite::SQLite(), dbname = "data/SQLDB.sqlite")
+db      <- DBI::dbConnect(RSQLite::SQLite(), dbname = "C:/Users/tdougall/OneDrive - Department for Education/Documents/shiny/GEO/LGBTSurvey2017/lgbt-survey-2017 test/data/SQLDB.sqlite")
 data    <- tbl(db, "allsqldata")
 tables  <- tbl(db, "tables")
 tables  <- tables %>% collect()
@@ -66,6 +66,7 @@ print(Sys.time() - start.time)
 
 reduce <- function(b){
   sapply(b, FUN = function(a) {
+    if(!(a %in% c("x","-"))){      a <- as.character(round(as.numeric(a),1))}
     if(grepl("\\.",a) == TRUE){
       paste0(substr(a, start = 0, stop= which(strsplit(a, "")[[1]]==".")+1)," %")
     }else if(grepl("x",a)  == TRUE | grepl("-",a)  == TRUE){
@@ -230,7 +231,7 @@ shinyServer(function(input, output, session) {
   })
   
 
-  output$table <-  DT::renderDataTable(server = FALSE,options = list(dom='t',ordering=FALSE),rownames=FALSE,{
+  output$table <-  DT::renderDataTable(server = FALSE,options = list(pageLength = 30, dom='t',ordering=FALSE),rownames=FALSE,{
     if(is.null(input$do) || input$do == 0 ){return(NULL)}
     print(outputlist()$dataout)
   })
@@ -339,6 +340,10 @@ shinyServer(function(input, output, session) {
 
           w.data <- w.data %>% collect()
 
+          print(w.data)
+          
+          print(w.data$value[1])
+          
     if(w.data$value[1] == "NA" || is.na(w.data$value[1])){
         return(list(datatest=FALSE, dataout=NULL, stackedplot=NULL,download=NULL))}
    
@@ -360,7 +365,7 @@ shinyServer(function(input, output, session) {
 
    Demographic <- input$chooseDemographic
    
-   return(list(datatest=datatest, dataout=table,download=download, w.data=w.data, Demographic=Demographic))
+   return(list(datatest=datatest, stackedplot = TRUE, dataout=table,download=download, w.data=w.data, Demographic=Demographic))
    
    
    })
@@ -378,10 +383,11 @@ shinyServer(function(input, output, session) {
    plot <- eventReactive(
      c(input$GRAPH,
      input$do),{  
-    if(is.null(input$do) || input$do == 0 ){return(NULL)}
+    if(is.null(input$do) || input$do == 0 || is.null(outputlist()$w.data)){return(NULL)}
   
   w.data <- outputlist()$w.data  
   
+
   colorder <- unique(w.data$Columns)
   roworder <- unique(w.data$Rows)
     
