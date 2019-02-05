@@ -38,20 +38,9 @@ library(ggplot2)
 library(stringr)
 library(data.table)
 library(DT)
-
-# start.time <- Sys.time()
-# 
-# setwd("C:/Users/tdougall/OneDrive - Department for Education/Documents/shiny/GEO/LGBTSurvey2017/lgbt-survey-2017/")
-# 
-# data <- readRDS("data/DummyData")
-# 
-# data <- data %>% mutate_at(vars(), function(x){gsub('[^ -~]', '', x)})
-# object.size(data)/(1024*1024)
-# vlookup <- read.csv("data/vlookup.csv",na.strings = "",header = TRUE)
-# 
-# tables <- distinct(data[,c("Chapter","Section","Question","Demographic","Filter1","Filter1Options","Filter2","Filter2Options","Filter3","Filter3Options")])
-# 
-# print(Sys.time() - start.time)
+library(dbplyr)
+library(DBI)
+library(RSQLite)
 
 start.time <- Sys.time()
 
