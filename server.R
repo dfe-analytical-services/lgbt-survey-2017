@@ -41,6 +41,9 @@ library(DT)
 library(dbplyr)
 library(DBI)
 library(RSQLite)
+library(shiny)
+library(devtools)
+library(grDevices)
 
 start.time <- Sys.time()
 

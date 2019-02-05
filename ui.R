@@ -27,14 +27,6 @@
 
 options(stringsAsFactors = FALSE)
 
-require(shiny)
-library(devtools)
-library(shinyBS)
-require(grDevices)
-require(plyr)
-
-require(data.table)
-require(dplyr)
 
 shinyUI(fluidPage(theme="shiny.css",
  
