@@ -47,7 +47,7 @@ library(grDevices)
 
 start.time <- Sys.time()
 
-db      <- DBI::dbConnect(RSQLite::SQLite(), dbname = "data/SQLDB.sqlite")
+db      <- DBI::dbConnect(RSQLite::SQLite(), dbname = "data/SQLDBNew.sqlite")
 data    <- tbl(db, "allsqldata")
 tables  <- tbl(db, "tables")
 tables  <- tables %>% collect()
